@@ -1,0 +1,37 @@
+2026-08-10 20:53:24.773 CDT [14325] LOG:  starting PostgreSQL 18.2 on aarch64-unknown-linux-android, compiled by Android (13989888, +pgo, +bolt, +lto, +mlgo, based on r563880c) clang version 21.0.0 (https://android.googlesource.com/toolchain/llvm-project 5e96669f06077099aa41290cdb4c5e6fa0f59349), 64-bit
+2026-08-10 20:53:24.774 CDT [14325] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2026-08-10 20:53:24.775 CDT [14325] LOG:  listening on Unix socket "/data/data/com.termux/files/usr/tmp/.s.PGSQL.5432"
+2026-08-10 20:53:24.828 CDT [14333] LOG:  database system was interrupted; last known up at 2026-08-10 20:41:48 CDT
+2026-08-10 20:53:25.140 CDT [14333] LOG:  database system was not properly shut down; automatic recovery in progress
+2026-08-10 20:53:25.147 CDT [14333] LOG:  redo starts at 0/299AB30
+2026-08-10 20:53:25.166 CDT [14333] LOG:  invalid record length at 0/29C5660: expected at least 24, got 0
+2026-08-10 20:53:25.166 CDT [14333] LOG:  redo done at 0/29C5558 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.01 s
+2026-08-10 20:53:25.182 CDT [14331] LOG:  checkpoint starting: end-of-recovery immediate wait
+2026-08-10 20:53:25.233 CDT [14331] LOG:  checkpoint complete: wrote 51 buffers (0.3%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.016 s, sync=0.022 s, total=0.052 s; sync files=45, longest=0.002 s, average=0.001 s; distance=170 kB, estimate=170 kB; lsn=0/29C5660, redo lsn=0/29C5660
+2026-08-10 20:53:25.239 CDT [14325] LOG:  database system is ready to accept connections
+2026-08-10 20:58:25.331 CDT [14331] LOG:  checkpoint starting: time
+2026-08-10 20:58:27.039 CDT [14331] LOG:  checkpoint complete: wrote 16 buffers (0.1%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=1.655 s, sync=0.014 s, total=1.709 s; sync files=13, longest=0.007 s, average=0.002 s; distance=51 kB, estimate=158 kB; lsn=0/29D23D8, redo lsn=0/29D2380
+2026-08-10 21:18:25.424 CDT [14331] LOG:  checkpoint starting: time
+2026-08-10 21:18:25.670 CDT [14331] LOG:  checkpoint complete: wrote 2 buffers (0.0%), wrote 0 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.209 s, sync=0.006 s, total=0.247 s; sync files=2, longest=0.005 s, average=0.003 s; distance=16 kB, estimate=144 kB; lsn=0/29D6548, redo lsn=0/29D64F0
+2026-08-10 21:33:25.884 CDT [14331] LOG:  checkpoint starting: time
+2026-08-10 21:35:01.866 CDT [14331] LOG:  checkpoint complete: wrote 955 buffers (5.8%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=95.829 s, sync=0.125 s, total=95.982 s; sync files=305, longest=0.005 s, average=0.001 s; distance=4372 kB, estimate=4372 kB; lsn=0/2E1B900, redo lsn=0/2E1B870
+2026-08-10 21:49:49.494 CDT [20582] FATAL:  terminating connection due to unexpected postmaster exit
+2026-08-10 21:49:49.496 CDT [17510] FATAL:  terminating connection due to unexpected postmaster exit
+2026-08-10 21:49:49.494 CDT [17517] FATAL:  terminating connection due to unexpected postmaster exit
+2026-08-10 21:49:49.494 CDT [20577] FATAL:  terminating connection due to unexpected postmaster exit
+2026-08-10 21:49:49.494 CDT [17508] FATAL:  terminating connection due to unexpected postmaster exit
+2026-08-10 21:49:49.494 CDT [20571] FATAL:  terminating connection due to unexpected postmaster exit
+2026-08-10 21:49:49.494 CDT [17523] FATAL:  terminating connection due to unexpected postmaster exit
+2026-08-10 21:49:49.494 CDT [17504] FATAL:  terminating connection due to unexpected postmaster exit
+2026-08-10 21:49:49.494 CDT [20576] FATAL:  terminating connection due to unexpected postmaster exit
+2026-08-10 21:49:49.494 CDT [20584] FATAL:  terminating connection due to unexpected postmaster exit
+2026-08-10 21:49:49.494 CDT [20580] FATAL:  terminating connection due to unexpected postmaster exit
+2026-08-10 21:49:49.494 CDT [20578] FATAL:  terminating connection due to unexpected postmaster exit
+2026-08-10 21:49:49.494 CDT [20579] FATAL:  terminating connection due to unexpected postmaster exit
+2026-08-10 21:49:49.494 CDT [17503] FATAL:  terminating connection due to unexpected postmaster exit
+2026-08-10 21:49:49.495 CDT [17498] FATAL:  terminating connection due to unexpected postmaster exit
+2026-08-10 21:49:49.495 CDT [17513] FATAL:  terminating connection due to unexpected postmaster exit
+2026-08-10 21:49:49.495 CDT [17514] FATAL:  terminating connection due to unexpected postmaster exit
+2026-08-10 21:49:49.495 CDT [20583] FATAL:  terminating connection due to unexpected postmaster exit
+2026-08-10 21:49:49.495 CDT [17521] FATAL:  terminating connection due to unexpected postmaster exit
+2026-08-10 21:49:49.495 CDT [20581] FATAL:  terminating connection due to unexpected postmaster exit

@@ -1,0 +1,23 @@
+# Build outputs
+**/build/
+
+# Gradle cache
+**/.gradle/
+
+# Logs
+logs/
+*.log
+
+# IDE
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp
+*.tmp
+
+# Docker temp
+dockerfiles/
