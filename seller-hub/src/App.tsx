@@ -37,12 +37,10 @@ export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Login form
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
 
-  // Register form
   const [regFirst, setRegFirst] = useState('');
   const [regLast, setRegLast] = useState('');
   const [regEmail, setRegEmail] = useState('');
@@ -63,10 +61,16 @@ export default function App() {
     setLoginError('');
     try {
       const res = await authApi.login(loginEmail, loginPassword);
-      const { token, user: u } = res.data;
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(u));
-      setUser(u);
+      const data = res.data;
+      const userData: User = {
+        email: data.email,
+        firstName: data.firstName || loginEmail.split('@')[0],
+        lastName: data.lastName || '',
+        role: data.role,
+      };
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(userData));
+      setUser(userData);
       setIsAuth(true);
     } catch {
       setLoginError('Credenciales incorrectas');
@@ -77,17 +81,29 @@ export default function App() {
     e.preventDefault();
     setRegError('');
     try {
-      await authApi.register({
+      const res = await authApi.register({
         email: regEmail,
         password: regPassword,
         firstName: regFirst,
         lastName: regLast,
       });
-      setActiveTab('login');
-      setLoginEmail(regEmail);
-      setRegError('');
-    } catch {
-      setRegError('Error al crear la cuenta');
+      const data = res.data;
+      const userData: User = {
+        email: data.email || regEmail,
+        firstName: data.firstName || regFirst,
+        lastName: data.lastName || regLast,
+        role: data.role || 'SELLER',
+      };
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(userData));
+      setUser(userData);
+      setIsAuth(true);
+    } catch (err: any) {
+      if (err.response?.data?.message) {
+        setRegError(err.response.data.message);
+      } else {
+        setRegError('Error al crear la cuenta');
+      }
     }
   };
 
@@ -103,7 +119,6 @@ export default function App() {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
   });
 
-  // AUTH SCREEN
   if (!isAuth) {
     return (
       <div id="auth-screen">
@@ -167,7 +182,6 @@ export default function App() {
     );
   }
 
-  // APP SCREEN
   return (
     <div id="app-screen">
       <aside id="sidebar" className={sidebarOpen ? 'open' : ''}>
