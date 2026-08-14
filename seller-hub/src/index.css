@@ -642,3 +642,40 @@ tr:hover td { background: var(--surface-2); }
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* Missing badges */
+.badge-green { background: rgba(0,212,170,0.15); color: var(--accent); }
+.badge-yellow { background: rgba(255,170,0,0.15); color: var(--warning); }
+.badge-red { background: rgba(255,77,106,0.15); color: var(--danger); }
+
+/* Stat sub text */
+.stat-card .stat-sub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+/* Select styling */
+.form-group select {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease;
+  outline: none;
+  cursor: pointer;
+}
+
+.form-group select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.form-group select option {
+  background: var(--surface-2);
+  color: var(--text);
+}

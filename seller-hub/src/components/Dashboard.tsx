@@ -1,78 +1,70 @@
 import { useEffect, useState } from 'react';
-import { ordersApi, productsApi } from '../services/api';
-
-interface Stats {
-  totalOrders: number;
-  totalProducts: number;
-  totalRevenue: number;
-  pendingOrders: number;
-}
+import { productsApi } from '../services/api';
 
 export default function Dashboard() {
-  const [stats, setStats] = useState<Stats>({
-    totalOrders: 0,
-    totalProducts: 0,
-    totalRevenue: 0,
-    pendingOrders: 0,
-  });
+  const [productCount, setProductCount] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadData();
+    productsApi.list()
+      .then(res => setProductCount(res.data.length))
+      .catch(() => setProductCount(0))
+      .finally(() => setLoading(false));
   }, []);
-
-  const loadData = async () => {
-    try {
-      const [ordersRes, productsRes] = await Promise.allSettled([
-        ordersApi.list(),
-        productsApi.list(),
-      ]);
-
-      const orders = ordersRes.status === 'fulfilled' ? ordersRes.value.data : [];
-      const products = productsRes.status === 'fulfilled' ? productsRes.value.data : [];
-
-      setStats({
-        totalOrders: orders.length,
-        totalProducts: products.length,
-        totalRevenue: orders.reduce((sum: number, o: any) => sum + (o.totalAmount || 0), 0),
-        pendingOrders: orders.filter((o: any) => o.status === 'PENDING').length,
-      });
-    } catch {
-      // API not connected yet
-    }
-  };
 
   return (
     <div>
       <div className="stats-grid">
         <div className="stat-card">
-          <div className="stat-label">Ventas Totales</div>
-          <div className="stat-value">${stats.totalRevenue.toLocaleString('es-MX')}</div>
-          <div className="stat-change up">+12% este mes</div>
+          <span className="stat-label">Productos</span>
+          <span className="stat-value">{loading ? '...' : productCount}</span>
+          <span className="stat-sub">activos en tu tienda</span>
         </div>
         <div className="stat-card">
-          <div className="stat-label">Pedidos</div>
-          <div className="stat-value">{stats.totalOrders}</div>
-          <div className="stat-change up">+8% este mes</div>
+          <span className="stat-label">Pedidos</span>
+          <span className="stat-value">-</span>
+          <span className="stat-sub">proximamente</span>
         </div>
         <div className="stat-card">
-          <div className="stat-label">Productos</div>
-          <div className="stat-value">{stats.totalProducts}</div>
-          <div className="stat-change up">Activos en tienda</div>
+          <span className="stat-label">Ingresos</span>
+          <span className="stat-value">-</span>
+          <span className="stat-sub">proximamente</span>
         </div>
         <div className="stat-card">
-          <div className="stat-label">Pedidos Pendientes</div>
-          <div className="stat-value">{stats.pendingOrders}</div>
-          <div className="stat-change down">Requieren atención</div>
+          <span className="stat-label">Envios</span>
+          <span className="stat-value">-</span>
+          <span className="stat-sub">proximamente</span>
         </div>
       </div>
-
-      <div className="card">
-        <div className="card-header">
-          <h3>Actividad Reciente</h3>
-        </div>
-        <div className="empty-state">
-          <h4>Bienvenido a Seller Hub</h4>
-          <p>Tu panel de vendedor está listo. Agrega productos y empieza a vender en CompraGo.</p>
+      <div className="card" style={{ marginTop: 24 }}>
+        <h3>Bienvenido a CompraGo Seller Hub</h3>
+        <p style={{ color: 'var(--text-muted)', marginTop: 8 }}>
+          Tu plataforma para gestionar tu negocio. Desde aqui puedes administrar productos, pedidos, inventario y envios.
+        </p>
+        <div className="roadmap-status" style={{ marginTop: 24 }}>
+          <h4>Estado del Roadmap</h4>
+          <div style={{ marginTop: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <span className="badge badge-green">Activo</span>
+              <span>Products Service</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <span className="badge badge-yellow">Proximamente</span>
+              <span>Sellers + Stores</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <span className="badge badge-yellow">Proximamente</span>
+              <span>Inventory</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <span className="badge badge-yellow">Proximamente</span>
+              <span>Orders</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <span className="badge badge-yellow">Proximamente</span>
+              <span>Shipping</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
