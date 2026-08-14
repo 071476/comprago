@@ -11,12 +11,15 @@ import java.net.URI
 
 @Configuration
 class R2Config(
-    @Value("\${r2.endpoint}") private val endpoint: String,
-    @Value("\${r2.access-key}") private val accessKey: String,
-    @Value("\${r2.secret-key}") private val secretKey: String
+    @Value("\${r2.endpoint:}") private val endpoint: String,
+    @Value("\${r2.access-key:}") private val accessKey: String,
+    @Value("\${r2.secret-key:}") private val secretKey: String
 ) {
     @Bean
-    fun s3Client(): S3Client {
+    fun s3Client(): S3Client? {
+        if (endpoint.isBlank() || accessKey.isBlank() || secretKey.isBlank()) {
+            return null
+        }
         return S3Client.builder()
             .endpointOverride(URI.create(endpoint))
             .credentialsProvider(
