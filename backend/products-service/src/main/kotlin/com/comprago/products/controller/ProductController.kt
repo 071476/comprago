@@ -8,11 +8,6 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/products")
-@CrossOrigin(
-    allowedOriginPatterns = ["*"],
-    methods = [RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS],
-    allowedHeaders = ["*"]
-)
 class ProductController(private val productService: ProductService) {
 
     @PostMapping

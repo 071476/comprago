@@ -10,11 +10,6 @@ import java.util.UUID
 
 @RestController
 @RequestMapping("/api/media")
-@CrossOrigin(
-    allowedOriginPatterns = ["*"],
-    methods = [RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS],
-    allowedHeaders = ["*"]
-)
 class MediaController(private val s3Client: S3Client?) {
 
     private val bucket = "comprago-media"
