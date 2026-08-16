@@ -1,6 +1,8 @@
 package com.comprago.inventory.controller
 
-import com.comprago.inventory.dto.*
+import com.comprago.inventory.dto.CreateInventoryRequest
+import com.comprago.inventory.dto.InventoryResponse
+import com.comprago.inventory.dto.UpdateStockRequest
 import com.comprago.inventory.service.InventoryService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -10,32 +12,41 @@ import org.springframework.web.bind.annotation.*
 class InventoryController(private val inventoryService: InventoryService) {
 
     @PostMapping
-    fun createInventory(@RequestBody request: CreateInventoryRequest): ResponseEntity<InventoryResponse> {
-        return ResponseEntity.ok(inventoryService.createInventory(request))
+    fun createItem(@RequestBody request: CreateInventoryRequest): ResponseEntity<InventoryResponse> {
+        return ResponseEntity.ok(inventoryService.createItem(request))
     }
 
-    @GetMapping("/product/{productId}")
-    fun getByProductId(@PathVariable productId: Long): ResponseEntity<InventoryResponse> {
-        return ResponseEntity.ok(inventoryService.getByProductId(productId))
+    @GetMapping("/{id}")
+    fun getItem(@PathVariable id: Long): ResponseEntity<InventoryResponse> {
+        return ResponseEntity.ok(inventoryService.getItem(id))
     }
 
-    @PostMapping("/product/{productId}/add")
-    fun addStock(@PathVariable productId: Long, @RequestBody request: UpdateStockRequest): ResponseEntity<InventoryResponse> {
-        return ResponseEntity.ok(inventoryService.addStock(productId, request))
+    @GetMapping
+    fun getAllItems(): ResponseEntity<List<InventoryResponse>> {
+        return ResponseEntity.ok(inventoryService.getAllItems())
     }
 
-    @PostMapping("/product/{productId}/reserve")
-    fun reserveStock(@PathVariable productId: Long, @RequestBody request: ReserveStockRequest): ResponseEntity<InventoryResponse> {
-        return ResponseEntity.ok(inventoryService.reserveStock(productId, request))
+    @GetMapping("/seller/{sellerId}")
+    fun getItemsBySeller(@PathVariable sellerId: Long): ResponseEntity<List<InventoryResponse>> {
+        return ResponseEntity.ok(inventoryService.getItemsBySeller(sellerId))
     }
 
-    @PostMapping("/product/{productId}/confirm")
-    fun confirmReservation(@PathVariable productId: Long, @RequestBody request: ReserveStockRequest): ResponseEntity<InventoryResponse> {
-        return ResponseEntity.ok(inventoryService.confirmReservation(productId, request))
+    @GetMapping("/low-stock")
+    fun getLowStockItems(): ResponseEntity<List<InventoryResponse>> {
+        return ResponseEntity.ok(inventoryService.getLowStockItems())
     }
 
-    @PostMapping("/product/{productId}/release")
-    fun releaseStock(@PathVariable productId: Long, @RequestBody request: ReserveStockRequest): ResponseEntity<InventoryResponse> {
-        return ResponseEntity.ok(inventoryService.releaseStock(productId, request))
+    @PutMapping("/{id}/stock")
+    fun updateStock(
+        @PathVariable id: Long,
+        @RequestBody request: UpdateStockRequest
+    ): ResponseEntity<InventoryResponse> {
+        return ResponseEntity.ok(inventoryService.updateStock(id, request.stock))
+    }
+
+    @DeleteMapping("/{id}")
+    fun deleteItem(@PathVariable id: Long): ResponseEntity<Void> {
+        inventoryService.deleteItem(id)
+        return ResponseEntity.ok().build()
     }
 }

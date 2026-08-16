@@ -1,101 +1,75 @@
 package com.comprago.orders.service
 
-import com.comprago.orders.dto.*
-import com.comprago.orders.model.Order
-import com.comprago.orders.model.OrderItem
+import com.comprago.orders.dto.CreateOrderRequest
+import com.comprago.orders.dto.OrderResponse
+import com.comprago.orders.entity.Order
 import com.comprago.orders.repository.OrderRepository
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
-import java.math.BigDecimal
 import java.time.LocalDateTime
 
 @Service
-class OrderService(private val repository: OrderRepository) {
+class OrderService(private val orderRepository: OrderRepository) {
 
-    @Transactional
-    fun createOrder(buyerId: Long, request: CreateOrderRequest): OrderResponse {
+    fun createOrder(request: CreateOrderRequest): OrderResponse {
         val order = Order(
-            buyerId = buyerId,
+            buyerId = request.buyerId,
             sellerId = request.sellerId,
             storeId = request.storeId,
-            shippingAddress = request.shippingAddress,
-            paymentMethod = request.paymentMethod,
-            status = "PENDING"
+            productId = request.productId,
+            productName = request.productName,
+            quantity = request.quantity,
+            unitPrice = request.unitPrice,
+            totalAmount = request.unitPrice.multiply(java.math.BigDecimal(request.quantity)),
+            status = "PENDING",
+            shippingAddress = request.shippingAddress
         )
-
-        var total = BigDecimal.ZERO
-        val orderItems = request.items.map { itemRequest ->
-            val subtotal = itemRequest.price.multiply(BigDecimal(itemRequest.quantity))
-            total += subtotal
-            OrderItem(
-                order = order,
-                productId = itemRequest.productId,
-                productName = itemRequest.productName,
-                price = itemRequest.price,
-                quantity = itemRequest.quantity,
-                imageUrl = itemRequest.imageUrl
-            )
-        }
-
-        order.items = orderItems.toMutableList()
-        order.total = total
-        order.updatedAt = LocalDateTime.now()
-
-        val saved = repository.save(order)
-        return saved.toResponse("Orden creada exitosamente")
+        return orderRepository.save(order).toResponse()
     }
 
     fun getOrder(id: Long): OrderResponse {
-        val order = repository.findById(id).orElseThrow {
-            NoSuchElementException("Orden no encontrada")
-        }
-        return order.toResponse("Orden encontrada")
+        val order = orderRepository.findById(id)
+            .orElseThrow { RuntimeException("Order not found: $id") }
+        return order.toResponse()
     }
 
-    fun getOrdersByBuyer(buyerId: Long): List<OrderResponse> {
-        return repository.findByBuyerId(buyerId).map {
-            it.toResponse("")
-        }
+    fun getAllOrders(): List<OrderResponse> {
+        return orderRepository.findAll().map { it.toResponse() }
     }
 
     fun getOrdersBySeller(sellerId: Long): List<OrderResponse> {
-        return repository.findBySellerId(sellerId).map {
-            it.toResponse("")
-        }
+        return orderRepository.findBySellerId(sellerId).map { it.toResponse() }
     }
 
-    @Transactional
-    fun updateStatus(orderId: Long, request: UpdateStatusRequest): OrderResponse {
-        val order = repository.findById(orderId).orElseThrow {
-            NoSuchElementException("Orden no encontrada")
-        }
-        order.status = request.status
-        order.updatedAt = LocalDateTime.now()
-        val saved = repository.save(order)
-        return saved.toResponse("Estado actualizado a ${request.status}")
+    fun getOrdersByBuyer(buyerId: Long): List<OrderResponse> {
+        return orderRepository.findByBuyerId(buyerId).map { it.toResponse() }
     }
 
-    private fun Order.toResponse(message: String) = OrderResponse(
-        id = this.id,
-        buyerId = this.buyerId,
-        sellerId = this.sellerId,
-        storeId = this.storeId,
-        items = this.items.map { item ->
-            OrderItemResponse(
-                id = item.id,
-                productId = item.productId,
-                productName = item.productName,
-                price = item.price,
-                quantity = item.quantity,
-                subtotal = item.subtotal,
-                imageUrl = item.imageUrl
-            )
-        },
-        total = this.total,
-        status = this.status,
-        shippingAddress = this.shippingAddress,
-        paymentMethod = this.paymentMethod,
-        createdAt = this.createdAt,
-        message = message
-    )
+    fun updateOrderStatus(id: Long, status: String): OrderResponse {
+        val order = orderRepository.findById(id)
+            .orElseThrow { RuntimeException("Order not found: $id") }
+        val updated = order.copy(status = status, updatedAt = LocalDateTime.now())
+        return orderRepository.save(updated).toResponse()
+    }
+
+    fun deleteOrder(id: Long) {
+        orderRepository.deleteById(id)
+    }
+
+    private fun Order.toResponse(): OrderResponse {
+        return OrderResponse(
+            id = id,
+            buyerId = buyerId,
+            sellerId = sellerId,
+            storeId = storeId,
+            productId = productId,
+            productName = productName,
+            quantity = quantity,
+            unitPrice = unitPrice,
+            totalAmount = totalAmount,
+            status = status,
+            shippingAddress = shippingAddress,
+            createdAt = createdAt.toString(),
+            updatedAt = updatedAt.toString()
+        )
+    }
 }

@@ -1,6 +1,8 @@
 package com.comprago.orders.controller
 
-import com.comprago.orders.dto.*
+import com.comprago.orders.dto.CreateOrderRequest
+import com.comprago.orders.dto.OrderResponse
+import com.comprago.orders.dto.UpdateOrderStatusRequest
 import com.comprago.orders.service.OrderService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -10,11 +12,8 @@ import org.springframework.web.bind.annotation.*
 class OrderController(private val orderService: OrderService) {
 
     @PostMapping
-    fun createOrder(
-        @RequestHeader("X-Buyer-Id") buyerId: Long,
-        @RequestBody request: CreateOrderRequest
-    ): ResponseEntity<OrderResponse> {
-        return ResponseEntity.ok(orderService.createOrder(buyerId, request))
+    fun createOrder(@RequestBody request: CreateOrderRequest): ResponseEntity<OrderResponse> {
+        return ResponseEntity.ok(orderService.createOrder(request))
     }
 
     @GetMapping("/{id}")
@@ -22,9 +21,9 @@ class OrderController(private val orderService: OrderService) {
         return ResponseEntity.ok(orderService.getOrder(id))
     }
 
-    @GetMapping("/buyer/{buyerId}")
-    fun getOrdersByBuyer(@PathVariable buyerId: Long): ResponseEntity<List<OrderResponse>> {
-        return ResponseEntity.ok(orderService.getOrdersByBuyer(buyerId))
+    @GetMapping
+    fun getAllOrders(): ResponseEntity<List<OrderResponse>> {
+        return ResponseEntity.ok(orderService.getAllOrders())
     }
 
     @GetMapping("/seller/{sellerId}")
@@ -32,11 +31,22 @@ class OrderController(private val orderService: OrderService) {
         return ResponseEntity.ok(orderService.getOrdersBySeller(sellerId))
     }
 
-    @PatchMapping("/{id}/status")
+    @GetMapping("/buyer/{buyerId}")
+    fun getOrdersByBuyer(@PathVariable buyerId: Long): ResponseEntity<List<OrderResponse>> {
+        return ResponseEntity.ok(orderService.getOrdersByBuyer(buyerId))
+    }
+
+    @PutMapping("/{id}/status")
     fun updateStatus(
         @PathVariable id: Long,
-        @RequestBody request: UpdateStatusRequest
+        @RequestBody request: UpdateOrderStatusRequest
     ): ResponseEntity<OrderResponse> {
-        return ResponseEntity.ok(orderService.updateStatus(id, request))
+        return ResponseEntity.ok(orderService.updateOrderStatus(id, request.status))
+    }
+
+    @DeleteMapping("/{id}")
+    fun deleteOrder(@PathVariable id: Long): ResponseEntity<Void> {
+        orderService.deleteOrder(id)
+        return ResponseEntity.ok().build()
     }
 }

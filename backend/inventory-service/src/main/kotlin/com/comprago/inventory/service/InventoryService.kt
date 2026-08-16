@@ -1,79 +1,70 @@
 package com.comprago.inventory.service
 
-import com.comprago.inventory.dto.*
-import com.comprago.inventory.model.InventoryItem
+import com.comprago.inventory.dto.CreateInventoryRequest
+import com.comprago.inventory.dto.InventoryResponse
+import com.comprago.inventory.entity.InventoryItem
 import com.comprago.inventory.repository.InventoryRepository
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
-class InventoryService(private val repository: InventoryRepository) {
+class InventoryService(private val inventoryRepository: InventoryRepository) {
 
-    fun createInventory(request: CreateInventoryRequest): InventoryResponse {
-        val existing = repository.findByProductId(request.productId)
-        if (existing != null) {
-            throw IllegalArgumentException("El producto ya tiene inventario")
-        }
+    fun createItem(request: CreateInventoryRequest): InventoryResponse {
         val item = InventoryItem(
             productId = request.productId,
-            stock = request.stock
+            sellerId = request.sellerId,
+            productName = request.productName,
+            stock = request.stock,
+            minStock = request.minStock,
+            maxStock = request.maxStock
         )
-        val saved = repository.save(item)
-        return saved.toResponse("Inventario creado exitosamente")
+        return inventoryRepository.save(item).toResponse()
     }
 
-    fun getByProductId(productId: Long): InventoryResponse {
-        val item = repository.findByProductId(productId) ?: throw NoSuchElementException("Inventario no encontrado")
-        return item.toResponse("Inventario encontrado")
+    fun getItem(id: Long): InventoryResponse {
+        val item = inventoryRepository.findById(id)
+            .orElseThrow { RuntimeException("Inventory item not found: $id") }
+        return item.toResponse()
     }
 
-    @Transactional
-    fun addStock(productId: Long, request: UpdateStockRequest): InventoryResponse {
-        val item = repository.findByProductId(productId) ?: throw NoSuchElementException("Inventario no encontrado")
-        item.stock += request.quantity
-        item.updatedAt = LocalDateTime.now()
-        val saved = repository.save(item)
-        return saved.toResponse("Stock actualizado")
+    fun getAllItems(): List<InventoryResponse> {
+        return inventoryRepository.findAll().map { it.toResponse() }
     }
 
-    @Transactional
-    fun reserveStock(productId: Long, request: ReserveStockRequest): InventoryResponse {
-        val item = repository.findByProductId(productId) ?: throw NoSuchElementException("Inventario no encontrado")
-        if (item.available < request.quantity) {
-            throw IllegalStateException("Stock insuficiente. Disponible: ${item.available}")
-        }
-        item.reserved += request.quantity
-        item.updatedAt = LocalDateTime.now()
-        val saved = repository.save(item)
-        return saved.toResponse("Stock reservado exitosamente")
+    fun getItemsBySeller(sellerId: Long): List<InventoryResponse> {
+        return inventoryRepository.findBySellerId(sellerId).map { it.toResponse() }
     }
 
-    @Transactional
-    fun confirmReservation(productId: Long, request: ReserveStockRequest): InventoryResponse {
-        val item = repository.findByProductId(productId) ?: throw NoSuchElementException("Inventario no encontrado")
-        item.stock -= request.quantity
-        item.reserved -= request.quantity
-        item.updatedAt = LocalDateTime.now()
-        val saved = repository.save(item)
-        return saved.toResponse("Reservación confirmada")
+    fun updateStock(id: Long, stock: Int): InventoryResponse {
+        val item = inventoryRepository.findById(id)
+            .orElseThrow { RuntimeException("Inventory item not found: $id") }
+        val updated = item.copy(stock = stock, updatedAt = LocalDateTime.now())
+        return inventoryRepository.save(updated).toResponse()
     }
 
-    @Transactional
-    fun releaseStock(productId: Long, request: ReserveStockRequest): InventoryResponse {
-        val item = repository.findByProductId(productId) ?: throw NoSuchElementException("Inventario no encontrado")
-        item.reserved -= request.quantity
-        item.updatedAt = LocalDateTime.now()
-        val saved = repository.save(item)
-        return saved.toResponse("Stock liberado")
+    fun getLowStockItems(): List<InventoryResponse> {
+        return inventoryRepository.findAll()
+            .filter { it.stock <= it.minStock }
+            .map { it.toResponse() }
     }
 
-    private fun InventoryItem.toResponse(message: String) = InventoryResponse(
-        id = this.id,
-        productId = this.productId,
-        stock = this.stock,
-        reserved = this.reserved,
-        available = this.available,
-        message = message
-    )
+    fun deleteItem(id: Long) {
+        inventoryRepository.deleteById(id)
+    }
+
+    private fun InventoryItem.toResponse(): InventoryResponse {
+        return InventoryResponse(
+            id = id,
+            productId = productId,
+            sellerId = sellerId,
+            productName = productName,
+            stock = stock,
+            minStock = minStock,
+            maxStock = maxStock,
+            lowStock = stock <= minStock,
+            createdAt = createdAt.toString(),
+            updatedAt = updatedAt.toString()
+        )
+    }
 }
