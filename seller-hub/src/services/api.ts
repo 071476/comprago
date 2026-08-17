@@ -11,7 +11,7 @@ api.interceptors.request.use((config) => {
 });
 
 const PRODUCTS = 'https://comprago-products.onrender.com';
-const ORDERS = 'https://comprago-orders.onrender.com';
+const ORDERS = 'https://comprago-orders-service.onrender.com';
 const INVENTORY = 'https://comprago-inventory.onrender.com';
 const SHIPPING = 'https://comprago-shipping.onrender.com';
 
