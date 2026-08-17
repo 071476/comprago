@@ -16,7 +16,7 @@ const INVENTORY = 'https://comprago-inventory.onrender.com';
 const SHIPPING = 'https://comprago-shipping.onrender.com';
 
 export const authApi = {
-  login: (email: string, password: string) => {
+  login: (email: string, _password: string) => {
     return Promise.resolve({
       data: {
         email,
