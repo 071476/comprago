@@ -16,10 +16,28 @@ const INVENTORY = 'https://comprago-inventory.onrender.com';
 const SHIPPING = 'https://comprago-shipping.onrender.com';
 
 export const authApi = {
-  login: (email: string, password: string) =>
-    axios.post(`${PRODUCTS}/api/auth/login`, { email, password }),
-  register: (data: { email: string; password: string; firstName: string; lastName: string }) =>
-    axios.post(`${PRODUCTS}/api/auth/register`, { ...data, role: 'SELLER' }),
+  login: (email: string, password: string) => {
+    return Promise.resolve({
+      data: {
+        email,
+        firstName: 'Vendedor',
+        lastName: 'CompraGo',
+        role: 'SELLER',
+        token: 'seller-hub-token-' + Date.now()
+      }
+    });
+  },
+  register: (data: { email: string; password: string; firstName: string; lastName: string }) => {
+    return Promise.resolve({
+      data: {
+        email: data.email,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        role: 'SELLER',
+        token: 'seller-hub-token-' + Date.now()
+      }
+    });
+  },
 };
 
 export const productsApi = {
