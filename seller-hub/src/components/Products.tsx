@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { productsApi } from '../services/api';
+import { useEffect, useState, useRef } from 'react';
+import { productsApi, mediaApi } from '../services/api';
 
 interface Product {
   id: number;
@@ -7,6 +7,7 @@ interface Product {
   description: string;
   price: number;
   category: string;
+  imageUrls: string[];
   active: boolean;
 }
 
@@ -18,7 +19,10 @@ export default function Products() {
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [category, setCategory] = useState('');
+  const [photoUrl, setPhotoUrl] = useState('');
+  const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { loadProducts(); }, []);
 
@@ -39,6 +43,7 @@ export default function Products() {
     setDescription('');
     setPrice('');
     setCategory('');
+    setPhotoUrl('');
     setShowModal(true);
   };
 
@@ -48,13 +53,29 @@ export default function Products() {
     setDescription(p.description);
     setPrice(String(p.price));
     setCategory(p.category || '');
+    setPhotoUrl(p.imageUrls?.[0] || '');
     setShowModal(true);
+  };
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const url = await mediaApi.upload(file);
+      setPhotoUrl(url);
+    } catch {
+      alert('Error al subir la foto');
+    } finally {
+      setUploading(false);
+    }
   };
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const data = { name, description, price: Number(price), category };
+      const imageUrls = photoUrl ? [photoUrl] : [];
+      const data = { name, description, price: Number(price), category, imageUrls };
       if (editing) {
         await productsApi.update(editing.id, data as any);
       } else {
@@ -98,6 +119,7 @@ export default function Products() {
           <table>
             <thead>
               <tr>
+                <th>Foto</th>
                 <th>Producto</th>
                 <th>Categoria</th>
                 <th>Precio</th>
@@ -108,6 +130,23 @@ export default function Products() {
             <tbody>
               {products.map((p) => (
                 <tr key={p.id}>
+                  <td>
+                    {p.imageUrls?.[0] ? (
+                      <img
+                        src={p.imageUrls[0]}
+                        alt={p.name}
+                        style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6 }}
+                      />
+                    ) : (
+                      <div style={{
+                        width: 48, height: 48, background: 'var(--surface-3)',
+                        borderRadius: 6, display: 'flex', alignItems: 'center',
+                        justifyContent: 'center', fontSize: '1.2rem', color: 'var(--text-dim)'
+                      }}>
+                        📷
+                      </div>
+                    )}
+                  </td>
                   <td>
                     <strong>{p.name}</strong>
                     <br />
@@ -139,6 +178,54 @@ export default function Products() {
               <button className="btn-close" onClick={() => setShowModal(false)}>x</button>
             </div>
             <form onSubmit={save}>
+              <div className="form-group">
+                <label>Foto del Producto</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                  {photoUrl ? (
+                    <img
+                      src={photoUrl}
+                      alt="preview"
+                      style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 8, border: '1px solid var(--border)' }}
+                    />
+                  ) : (
+                    <div style={{
+                      width: 80, height: 80, background: 'var(--surface-3)',
+                      borderRadius: 8, display: 'flex', alignItems: 'center',
+                      justifyContent: 'center', fontSize: '2rem', color: 'var(--text-dim)',
+                      border: '1px solid var(--border)'
+                    }}>
+                      📷
+                    </div>
+                  )}
+                  <div>
+                    <input
+                      ref={fileRef}
+                      type="file"
+                      accept="image/*"
+                      style={{ display: 'none' }}
+                      onChange={handleFileSelect}
+                    />
+                    <button
+                      type="button"
+                      className="btn-sm"
+                      disabled={uploading}
+                      onClick={() => fileRef.current?.click()}
+                    >
+                      {uploading ? 'Subiendo...' : 'Seleccionar foto'}
+                    </button>
+                    {photoUrl && (
+                      <button
+                        type="button"
+                        className="btn-sm"
+                        style={{ marginLeft: 8, background: 'var(--danger)' }}
+                        onClick={() => setPhotoUrl('')}
+                      >
+                        Quitar
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
               <div className="form-group">
                 <label>Nombre</label>
                 <input type="text" value={name} onChange={e => setName(e.target.value)} required />

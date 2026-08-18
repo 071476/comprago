@@ -40,12 +40,23 @@ export const authApi = {
   },
 };
 
+export const mediaApi = {
+  upload: async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await api.post(`${PRODUCTS}/api/media/upload`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return res.data.url as string;
+  },
+};
+
 export const productsApi = {
   list: () => api.get(`${PRODUCTS}/api/products`),
   getOne: (id: number) => api.get(`${PRODUCTS}/api/products/${id}`),
-  create: (data: { name: string; description: string; price: number; category?: string; stock?: number }) =>
+  create: (data: { name: string; description: string; price: number; category?: string; stock?: number; imageUrls?: string[] }) =>
     api.post(`${PRODUCTS}/api/products`, data, { headers: { 'X-Seller-Id': '1' } }),
-  update: (id: number, data: { name: string; description: string; price: number }) =>
+  update: (id: number, data: { name: string; description: string; price: number; imageUrls?: string[] }) =>
     api.put(`${PRODUCTS}/api/products/${id}`, data),
   delete: (id: number) => api.delete(`${PRODUCTS}/api/products/${id}`),
 };
